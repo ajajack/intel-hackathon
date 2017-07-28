@@ -142,10 +142,9 @@ var app = {
         var buttonValue = bytesToString(arrayBufferToIntArray(data));
         velocityLabel.innerHTML = buttonValue;
         var velocity = JSON.parse(velocityLabel);
-        vx.innerHTML = velocity[0];
-        vy.innerHTML = velocity[1];
-        vz.innerHTML = velocity[2];
-        control.innerHTML = "GOT IT!";
+        vx.textContent = velocity[0];
+        vy.textContent = velocity[1];
+        vz.textContent = velocity[2];
     },
     disconnect: function(event) {
         var deviceId = event.target.dataset.deviceId;
