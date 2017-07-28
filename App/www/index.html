@@ -6,20 +6,29 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1,  target-densitydpi=device-dpi" />
         
         <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>SportSTEM: Trajectory Prediction</title>
+        <title>STEMulate SPORTS</title>
     </head>
     <body>
         <div class="app">
-            <h1>Trajectory Prediction</h1>
+            <img style='height: 100%; width: 100%; object-fit: contain' src='logo.png' />
             <div id="mainPage">
                 <ul id="deviceList">                    
                 </ul>
                 <button id="refreshButton">Refresh</button>
             </div>
             <div id="detailPage">
-                <div id="velocityLabel">Loading...</div>
+                <h1>Trajectory Prediction</h1>
+                <p>Hold down the button while throwing the ball.<br>Release it as you release the ball.</p>
+                
+                <h3>Predict Range</h3>
+                <h4>Initial Velocities (m/s):</h4>
                 <div>Vx: <span id="vx">...</span></div>
                 <div>Vy: <span id="vy">...</span></div>
+                <p>Use the velocity values above (from your throw) to calculate the range.</p>
+                <img style='height: 100%; width: 100%; object-fit: contain' src='guide.gif' />
+                <h4>Check your work</h4>
+                <div>Range: <span id="range">...</span></div>
+                <p>Compare this value with your calculaed value.<br>Now, go out and measure your throw experimentally! See how close the real range matches your calculated range.</p>
                 <button id="disconnectButton">Disconnect</button>
             </div>            
         </div>
