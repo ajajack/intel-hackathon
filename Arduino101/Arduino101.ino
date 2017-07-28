@@ -5,7 +5,7 @@
 
 unsigned long microsPerReading, microsPrevious;
 float accelScale;
-float vx, vy, vz;
+float vx, vy, vz, vh, vv;
 
 BLEService orientationService("19B10010-E8F2-537E-4F6C-D104768A1214"); // create service
 BLECharacteristic orientationCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify, 20); // allows remote device to get notifications
@@ -47,6 +47,8 @@ void setup() {
   vx = 0;
   vy = 0;
   vz = 0;
+  vv = 0;
+  vh = 0;
 }
 
 void loop() {
@@ -70,8 +72,11 @@ void loop() {
     vy = vy + ay * 25E-6;
     vz = vz + az * 25E-6;
 
+    vh = sqrt(pow(vx, 2) + pow(vy, 2));
+    vv = vz;
+
     // Package and send over BLE and locally over serial
-    String stringOutput = "[" + String(vx, 3) + "," + String(vy, 3) + "," + String(vz, 3) + "]";
+    String stringOutput = "[" + String(vv, 3) + "," + String(vz, 3) + "]";
     orientationCharacteristic.setValue(stringOutput.c_str());
     Serial.println(stringOutput);
 
@@ -85,6 +90,8 @@ void loop() {
     vx = 0;
     vy = 0;
     vz = 0;
+    vv = 0;
+    vh = 0;
   }
   
 }
