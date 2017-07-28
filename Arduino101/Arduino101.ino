@@ -60,7 +60,7 @@ void loop() {
     // read raw data from CurieIMU
     CurieIMU.readAccelerometer(aix, aiy, aiz);
 
-    // convert from raw data to m/s^2
+    // convert from raw data to cm/s^2
     ax = convertRawAcceleration(aix);
     ay = convertRawAcceleration(aiy);
     az = convertRawAcceleration(aiz);
@@ -71,7 +71,7 @@ void loop() {
     vz = vz + az * 25E-6;
 
     // Package and send over BLE and locally over serial
-    String stringOutput = String(vx, 1) + "," + String(vy, 1) + "," + String(vz, 1);
+    String stringOutput = "[" + String(vx, 1) + "," + String(vy, 1) + "," + String(vz, 1) + "]";
     orientationCharacteristic.setValue(stringOutput.c_str());
     Serial.println(stringOutput);
 
@@ -94,6 +94,6 @@ float convertRawAcceleration(int aRaw) {
   // -2g maps to a raw value of -32768
   // +2g maps to a raw value of 32767
   
-  float a = 9.8 * (aRaw * 2.0) / 32768.0;
+  float a = 100 * 9.8 * (aRaw * 2.0) / 32768.0;
   return a;
 }

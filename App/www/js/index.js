@@ -26,7 +26,6 @@ var arrayBufferToInt = function (ab) {
 var rfduino = {
     serviceUUID: "19B10010-E8F2-537E-4F6C-D104768A1214",
     receiveCharacteristic: "19B10011-E8F2-537E-4F6C-D104768A1214",
-    sendCharacteristic: "19B10012-E8F2-537E-4F6C-D104768A1214",
 };
 
 // returns advertising data as hashmap of byte arrays keyed by type
@@ -106,7 +105,6 @@ var app = {
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         refreshButton.addEventListener('touchstart', this.refreshDeviceList, false);
-        ledButton.addEventListener('touchend', this.sendData, false);
         disconnectButton.addEventListener('touchstart', this.disconnect, false);
         deviceList.addEventListener('touchstart', this.connect, false); // assume not scrolling
     },
@@ -134,33 +132,20 @@ var app = {
                 // subscribe for incoming data
                 ble.startNotification(deviceId, rfduino.serviceUUID, rfduino.receiveCharacteristic, app.onData, app.onError);
                 disconnectButton.dataset.deviceId = deviceId;
-                ledButton.dataset.deviceId = deviceId;
                 app.showDetailPage();
             };
 
         ble.connect(deviceId, onConnect, app.onError);
     },
-    onData: function(data) { // data received from rfduino
+    onData: function(data) { // data received from Arduino 101
         console.log(data);
         var buttonValue = bytesToString(arrayBufferToIntArray(data));
-        buttonState.innerHTML = buttonValue;
-    },
-    sendData: function(event) { // send data to rfduino
-
-        var success = function() {
-            console.log("success");
-        };
-
-        var failure = function() {
-            alert("Failed writing data to the rfduino");
-        };
-
-        var data = new Uint8Array(1);
-        data[0] = event.type === 'touchstart' ? 0x1 : 0x0;
-        var deviceId = event.target.dataset.deviceId;
-
-        ble.writeWithoutResponse(deviceId, rfduino.serviceUUID, rfduino.sendCharacteristic, data.buffer, success, failure);
-
+        velocityLabel.innerHTML = buttonValue;
+        var velocity = JSON.parse(velocityLabel);
+        vx.innerHTML = velocity[0];
+        vy.innerHTML = velocity[1];
+        vz.innerHTML = velocity[2];
+        control.innerHTML = "GOT IT!";
     },
     disconnect: function(event) {
         var deviceId = event.target.dataset.deviceId;

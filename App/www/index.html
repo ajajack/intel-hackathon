@@ -6,19 +6,22 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1,  target-densitydpi=device-dpi" />
         
         <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>RFduino LED Button</title>
+        <title>SportSTEM: Trajectory Prediction</title>
     </head>
     <body>
         <div class="app">
-            <h1>RFduino LED Button</h1>
+            <h1>Trajectory Prediction</h1>
             <div id="mainPage">
                 <ul id="deviceList">                    
                 </ul>
                 <button id="refreshButton">Refresh</button>
             </div>
             <div id="detailPage">
-                <div id="buttonState">Button Released</div>
-                <div id="ledButton">Hold for LED</div>
+                <div id="velocityLabel">Loading...</div>
+                <div>X: <span id="vx">...</span></div>
+                <div>Y: <span id="vy">...</span></div>
+                <div>Y: <span id="vz">...</span></div>
+                <div>Control: <span id="control">...</span></div>
                 <button id="disconnectButton">Disconnect</button>
             </div>            
         </div>
