@@ -7,6 +7,8 @@ unsigned long microsPerReading, microsPrevious;
 float accelScale;
 float vx, vy, vz, vh, vv;
 
+bool recording = 0;
+
 BLEService orientationService("19B10010-E8F2-537E-4F6C-D104768A1214"); // create service
 BLECharacteristic orientationCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify, 20); // allows remote device to get notifications
 
@@ -72,6 +74,23 @@ void loop() {
     vy = vy + ay * 25E-6;
     vz = vz + az * 25E-6;
 
+    // increment previous time, so we keep proper pace
+    microsPrevious = microsPrevious + microsPerReading;
+  }
+
+  // Check button
+  if(digitalRead(buttonPin) && !recording) {
+    recording = true;
+    vx = 0;
+    vy = 0;
+    vz = 0;
+    vv = 0;
+    vh = 0;
+  } else if(!digitalRead(buttonPin && recording)) {
+    // Released
+    recording = false;
+
+    // Send
     vh = sqrt(pow(vx, 2) + pow(vy, 2));
     vv = vz;
 
@@ -79,19 +98,6 @@ void loop() {
     String stringOutput = "[" + String(vh, 3) + "," + String(vv, 3) + "]";
     orientationCharacteristic.setValue(stringOutput.c_str());
     Serial.println(stringOutput);
-
-    // increment previous time, so we keep proper pace
-    microsPrevious = microsPrevious + microsPerReading;
-  }
-
-  // Check button
-  if(digitalRead(buttonPin)) {
-    // Keep reseting to 0 until you lift your finger off of the button
-    vx = 0;
-    vy = 0;
-    vz = 0;
-    vv = 0;
-    vh = 0;
   }
   
 }
