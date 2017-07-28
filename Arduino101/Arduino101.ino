@@ -1,10 +1,11 @@
 #include <CurieIMU.h>
 #include <CurieBLE.h>
-#include <MadgwickAHRS.h>
 
-Madgwick filter;
+#define buttonPin 4
+
 unsigned long microsPerReading, microsPrevious;
-float accelScale, gyroScale;
+float accelScale;
+float vx, vy, vz;
 
 BLEService orientationService("19B10010-E8F2-537E-4F6C-D104768A1214"); // create service
 BLECharacteristic orientationCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify, 20); // allows remote device to get notifications
@@ -14,14 +15,10 @@ void setup() {
 
   // start the IMU and filter
   CurieIMU.begin();
-  CurieIMU.setGyroRate(25);
   CurieIMU.setAccelerometerRate(25);
-  filter.begin(25);
 
   // Set the accelerometer range to 2G
   CurieIMU.setAccelerometerRange(2);
-  // Set the gyroscope range to 250 degrees/second
-  CurieIMU.setGyroRange(250);
 
   // initialize variables to pace updates to correct rate
   microsPerReading = 1000000 / 25;
@@ -41,56 +38,55 @@ void setup() {
   // add the service
   BLE.addService(orientationService);
 
-  orientationCharacteristic.setValue("Test");
+  orientationCharacteristic.setValue("Loading...");
 
   // start advertising
   BLE.advertise();
+
+  // Set initial velocity
+  vx = 0;
+  vy = 0;
+  vz = 0;
 }
 
 void loop() {
   int aix, aiy, aiz;
-  int gix, giy, giz;
   float ax, ay, az;
-  float gx, gy, gz;
-  float roll, pitch, heading;
   unsigned long microsNow;
 
   // check if it's time to read data and update the filter
   microsNow = micros();
   if (microsNow - microsPrevious >= microsPerReading) {
-
     // read raw data from CurieIMU
-    CurieIMU.readMotionSensor(aix, aiy, aiz, gix, giy, giz);
+    CurieIMU.readAccelerometer(aix, aiy, aiz);
 
-    // convert from raw data to gravity and degrees/second units
+    // convert from raw data to m/s^2
     ax = convertRawAcceleration(aix);
     ay = convertRawAcceleration(aiy);
     az = convertRawAcceleration(aiz);
-    gx = convertRawGyro(gix);
-    gy = convertRawGyro(giy);
-    gz = convertRawGyro(giz);
 
-    // update the filter, which computes orientation
-    filter.updateIMU(gx, gy, gz, ax, ay, az);
+    // time = 25 us, because we set that above
+    vx = vx + ax * 25E-6;
+    vy = vy + ay * 25E-6;
+    vz = vz + az * 25E-6;
 
-    // print the heading, pitch and roll
-    roll = filter.getRoll();
-    pitch = filter.getPitch();
-    heading = filter.getYaw();
-    Serial.print("Orientation: ");
-    Serial.print(heading);
-    Serial.print(" ");
-    Serial.print(pitch);
-    Serial.print(" ");
-    Serial.println(roll);
-    
-    // Package and send over BLE
-    String stringOutput = String(heading, 1) + "," + String(pitch, 1) + "," + String(roll, 1);
+    // Package and send over BLE and locally over serial
+    String stringOutput = String(vx, 1) + "," + String(vy, 1) + "," + String(vz, 1);
     orientationCharacteristic.setValue(stringOutput.c_str());
+    Serial.println(stringOutput);
 
     // increment previous time, so we keep proper pace
     microsPrevious = microsPrevious + microsPerReading;
   }
+
+  // Check button
+  if(digitalRead(buttonPin)) {
+    // Keep reseting to 0 until you lift your finger off of the button
+    vx = 0;
+    vy = 0;
+    vz = 0;
+  }
+  
 }
 
 float convertRawAcceleration(int aRaw) {
@@ -98,15 +94,6 @@ float convertRawAcceleration(int aRaw) {
   // -2g maps to a raw value of -32768
   // +2g maps to a raw value of 32767
   
-  float a = (aRaw * 2.0) / 32768.0;
+  float a = 9.8 * (aRaw * 2.0) / 32768.0;
   return a;
-}
-
-float convertRawGyro(int gRaw) {
-  // since we are using 250 degrees/seconds range
-  // -250 maps to a raw value of -32768
-  // +250 maps to a raw value of 32767
-  
-  float g = (gRaw * 250.0) / 32768.0;
-  return g;
 }
