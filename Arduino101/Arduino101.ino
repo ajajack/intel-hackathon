@@ -76,7 +76,7 @@ void loop() {
     vv = vz;
 
     // Package and send over BLE and locally over serial
-    String stringOutput = "[" + String(vv, 3) + "," + String(vz, 3) + "]";
+    String stringOutput = "[" + String(vh, 3) + "," + String(vv, 3) + "]";
     orientationCharacteristic.setValue(stringOutput.c_str());
     Serial.println(stringOutput);
 

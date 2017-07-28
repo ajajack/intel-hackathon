@@ -144,7 +144,6 @@ var app = {
         var velocity = JSON.parse(buttonValue);
         vx.textContent = velocity[0];
         vy.textContent = velocity[1];
-        vz.textContent = velocity[2];
     },
     disconnect: function(event) {
         var deviceId = event.target.dataset.deviceId;
