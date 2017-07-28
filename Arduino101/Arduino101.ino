@@ -7,7 +7,7 @@ unsigned long microsPerReading, microsPrevious;
 float accelScale;
 float vx, vy, vz, vh, vv;
 
-bool recording = 0;
+bool recording = false;
 
 BLEService orientationService("19B10010-E8F2-537E-4F6C-D104768A1214"); // create service
 BLECharacteristic orientationCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify, 20); // allows remote device to get notifications
@@ -81,6 +81,7 @@ void loop() {
   // Check button
   if(digitalRead(buttonPin) && !recording) {
     recording = true;
+    Serial.println("Press");
     vx = 0;
     vy = 0;
     vz = 0;
@@ -89,6 +90,7 @@ void loop() {
   } else if(!digitalRead(buttonPin && recording)) {
     // Released
     recording = false;
+    Serial.println("Release");
 
     // Send
     vh = sqrt(pow(vx, 2) + pow(vy, 2));
@@ -98,6 +100,7 @@ void loop() {
     String stringOutput = "[" + String(vh, 3) + "," + String(vv, 3) + "]";
     orientationCharacteristic.setValue(stringOutput.c_str());
     Serial.println(stringOutput);
+    delay(250);
   }
   
 }
