@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.intelhack.arduino101" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Intel Hackathon</name>
+    <description>
+        Companion app for communicating with Arduino 101
+    </description>
+    <author href="https://github.com/don">
+        Don Coleman
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="orientation" value="portrait" />
+    <plugin name="cordova-plugin-ble-central" spec="~1.1.4" />
+</widget>
