@@ -140,7 +140,6 @@ var app = {
     onData: function(data) { // data received from Arduino 101
         console.log(data);
         var buttonValue = bytesToString(arrayBufferToIntArray(data));
-        velocityLabel.innerHTML = buttonValue;
         var velocity = JSON.parse(buttonValue);
         vx.textContent = velocity[0];
         vy.textContent = velocity[1];
